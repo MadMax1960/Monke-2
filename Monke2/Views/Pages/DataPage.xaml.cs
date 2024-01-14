@@ -31,8 +31,49 @@ namespace Monke2.Views.Pages
 			{
 				string acbFilePath = openFileDialog.FileName;
 				RunAcbEditor(acbFilePath);
+
+				// Call UpdateFileList with the path of the selected ACB file
+				UpdateFileList(acbFilePath);
 			}
 		}
+
+
+		private void UpdateFileList(string acbFilePath)
+		{
+			FilesListBox.Items.Clear();
+
+			// Extracting the directory where the ACB file is located
+			string acbFileDirectory = Path.GetDirectoryName(acbFilePath);
+
+			// Extracting the ACB file name without the extension
+			string acbFileNameWithoutExtension = Path.GetFileNameWithoutExtension(acbFilePath);
+
+			// Constructing the path to the subfolder named after the ACB file
+			string decompiledFolderPath = Path.Combine(acbFileDirectory, acbFileNameWithoutExtension);
+
+			// Display the path for debugging purposes
+			MessageBox.Show($"Looking for files in: {decompiledFolderPath}");
+
+			// Checking if the decompiled folder exists
+			if (Directory.Exists(decompiledFolderPath))
+			{
+				string[] files = Directory.GetFiles(decompiledFolderPath);
+				foreach (var file in files)
+				{
+					FilesListBox.Items.Add(Path.GetFileName(file));
+				}
+			}
+			else
+			{
+				FilesListBox.Items.Add($"No files found in {decompiledFolderPath}");
+			}
+		}
+
+
+
+
+
+
 
 		private void RunAcbEditor(string path)
 		{

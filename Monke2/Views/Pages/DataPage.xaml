@@ -24,8 +24,11 @@
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
 
-        <!-- Decompile ACB Button -->
         <Button Content="Decompile ACB" HorizontalAlignment="Center" Margin="0,74,0,0" Click="DecompileACB_Click" VerticalAlignment="Top"/>
+
+        <!-- ListBox to display the files -->
+        <ListBox x:Name="FilesListBox" Grid.ColumnSpan="2" Margin="10,150,285,10"/>
+
 
         <!-- Compile ACB Button -->
         <Button Content="Compile ACB" Grid.Column="1" HorizontalAlignment="Center" Margin="0,74,0,0" Click="CompileACB_Click" VerticalAlignment="Top"/>
