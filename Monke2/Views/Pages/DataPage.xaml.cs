@@ -53,34 +53,25 @@ namespace Monke2.Views.Pages
 		{
 			try
 			{
-				// Step 1: Read the .uasset file as bytes
+				// Read the .uasset file as bytes
 				byte[] fileBytes = File.ReadAllBytes(filePath);
 
-				// Step 2: Search for the first occurrence of "@UTF" in the byte array
+				// Search for the first occurrence of "@UTF" in the byte array
 				int index = FindSequence(fileBytes, new byte[] { 0x40, 0x55, 0x54, 0x46 });
 
 				if (index != -1)
 				{
-					// Step 3: Extract the bytes before the found "@UTF" signature
-					byte[] newData = new byte[index];
-					Array.Copy(fileBytes, 0, newData, 0, index);
+					// Extract the bytes starting from the "@UTF" signature to the end of the file
+					byte[] newData = new byte[fileBytes.Length - index];
+					Array.Copy(fileBytes, index, newData, 0, newData.Length);
 
-					// Step 4: Write the extracted bytes to a new file with the extension ".uasset.h"
-					string newFilePath = Path.ChangeExtension(filePath, ".uasset.h");
+					// Write the extracted bytes to a new file with the extension ".acb"
+					string newFilePath = Path.ChangeExtension(filePath, ".acb");
 					File.WriteAllBytes(newFilePath, newData);
 
-					// Step 5: Delete the extracted bytes from the original .uasset file
-					byte[] remainingBytes = new byte[fileBytes.Length - index];
-					Array.Copy(fileBytes, index, remainingBytes, 0, remainingBytes.Length);
-					File.WriteAllBytes(filePath, remainingBytes);
-
-					// Step 6: Rename the original .uasset file to have a new extension ".acb"
-					string renamedFilePath = Path.ChangeExtension(filePath, ".acb");
-					File.Move(filePath, renamedFilePath);
-
-					// Step 7: Run the original ACB decompilation code
-					RunAcbEditor(renamedFilePath);
-					UpdateFileList(renamedFilePath);
+					// Run the original ACB decompilation code
+					RunAcbEditor(newFilePath);
+					UpdateFileList(newFilePath);
 
 					MessageBox.Show("Processed .uasset file successfully.");
 				}
@@ -94,11 +85,6 @@ namespace Monke2.Views.Pages
 				MessageBox.Show("Error handling .uasset file: " + ex.Message);
 			}
 		}
-
-
-
-
-
 
 
 
@@ -171,21 +157,88 @@ namespace Monke2.Views.Pages
 
 		private void CompileACB_Click(object sender, RoutedEventArgs e)
 		{
-			OpenFileDialog folderDialog = new OpenFileDialog
+			OpenFileDialog openFileDialog = new OpenFileDialog
 			{
-				ValidateNames = false,
-				CheckFileExists = false,
-				CheckPathExists = true,
-				FileName = "Folder Selection.", // The user will type the folder or navigate into it
-				Filter = "Folder|*.none" // Dummy filter
+				Filter = "UASSET Files (*.uasset)|*.uasset",
+				Title = "Select UASSET File"
 			};
 
-			if (folderDialog.ShowDialog() == true)
+			if (openFileDialog.ShowDialog() == true)
 			{
-				string folderPath = Path.GetDirectoryName(folderDialog.FileName);
-				RunAcbEditor(folderPath);
+				string uassetFilePath = openFileDialog.FileName;
+				string folderPath = Path.GetDirectoryName(uassetFilePath);
+				string folderName = Path.GetFileNameWithoutExtension(uassetFilePath);
+
+				if (Directory.Exists(folderPath))
+				{
+					// Run AcbEditor.exe with the folder path
+					RunAcbEditor(Path.Combine(folderPath, folderName));
+
+					// Find the ACB file with the same name as the UASSET file
+					string acbFileName = folderName + ".acb";
+					string acbFilePath = Path.Combine(folderPath, acbFileName);
+
+					if (File.Exists(acbFilePath))
+					{
+						// Insert ACB into UASSET file
+						InsertAcbIntoUasset(uassetFilePath, acbFilePath);
+					}
+					else
+					{
+						MessageBox.Show($"ACB file '{acbFileName}' not found in the folder.");
+					}
+				}
+				else
+				{
+					MessageBox.Show($"Folder '{folderName}' not found.");
+				}
 			}
 		}
+
+
+
+
+
+
+		private void InsertAcbIntoUasset(string uassetFilePath, string acbFilePath)
+		{
+			try
+			{
+				byte[] uassetBytes = File.ReadAllBytes(uassetFilePath);
+				byte[] acbBytes = File.ReadAllBytes(acbFilePath);
+
+				// Find the index of "@UTF" in the UASSET file
+				int utfIndex = FindSequence(uassetBytes, new byte[] { 0x40, 0x55, 0x54, 0x46 });
+
+				if (utfIndex != -1)
+				{
+					// Overwrite bytes in the UASSET file with ACB bytes
+					Array.Copy(acbBytes, 0, uassetBytes, utfIndex, acbBytes.Length);
+
+					// Write the modified UASSET file
+					File.WriteAllBytes(uassetFilePath, uassetBytes);
+
+					MessageBox.Show($"ACB file '{Path.GetFileName(acbFilePath)}' inserted into UASSET file '{Path.GetFileName(uassetFilePath)}' successfully.");
+				}
+				else
+				{
+					MessageBox.Show("Could not find '@UTF' in the UASSET file.");
+				}
+			}
+			catch (Exception ex)
+			{
+				MessageBox.Show("Error inserting ACB into UASSET file: " + ex.Message);
+			}
+		}
+
+
+
+
+
+
+
+
+
 
 		private void ACBVolume_Click(object sender, RoutedEventArgs e)
 		{
