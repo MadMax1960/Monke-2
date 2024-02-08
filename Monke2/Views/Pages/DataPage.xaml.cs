@@ -23,19 +23,85 @@ namespace Monke2.Views.Pages
 		{
 			OpenFileDialog openFileDialog = new OpenFileDialog
 			{
-				Filter = "ACB Files (*.acb)|*.acb",
-				Title = "Select ACB File"
+				Filter = "ACB Files (*.acb)|*.acb|UASSET Files (*.uasset)|*.uasset",
+				Title = "Select ACB or UASSET File"
 			};
 
 			if (openFileDialog.ShowDialog() == true)
 			{
-				string acbFilePath = openFileDialog.FileName;
-				RunAcbEditor(acbFilePath);
+				string filePath = openFileDialog.FileName;
 
-				// Call UpdateFileList with the path of the selected ACB file
-				UpdateFileList(acbFilePath);
+				if (filePath.EndsWith(".uasset", StringComparison.OrdinalIgnoreCase))
+				{
+					// Handle UASSET file
+					HandleUASSETFile(filePath);
+				}
+				else if (filePath.EndsWith(".acb", StringComparison.OrdinalIgnoreCase))
+				{
+					// Handle ACB file
+					RunAcbEditor(filePath);
+					UpdateFileList(filePath);
+				}
+				else
+				{
+					MessageBox.Show("Unsupported file format.");
+				}
 			}
 		}
+
+		private void HandleUASSETFile(string filePath)
+		{
+			try
+			{
+				// Step 1: Read the .uasset file as bytes
+				byte[] fileBytes = File.ReadAllBytes(filePath);
+
+				// Step 2: Search for the first occurrence of "@UTF" in the byte array
+				int index = FindSequence(fileBytes, new byte[] { 0x40, 0x55, 0x54, 0x46 });
+
+				if (index != -1)
+				{
+					// Step 3: Extract the bytes before the found "@UTF" signature
+					byte[] newData = new byte[index];
+					Array.Copy(fileBytes, 0, newData, 0, index);
+
+					// Step 4: Write the extracted bytes to a new file with the extension ".uasset.h"
+					string newFilePath = Path.ChangeExtension(filePath, ".uasset.h");
+					File.WriteAllBytes(newFilePath, newData);
+
+					// Step 5: Delete the extracted bytes from the original .uasset file
+					byte[] remainingBytes = new byte[fileBytes.Length - index];
+					Array.Copy(fileBytes, index, remainingBytes, 0, remainingBytes.Length);
+					File.WriteAllBytes(filePath, remainingBytes);
+
+					// Step 6: Rename the original .uasset file to have a new extension ".acb"
+					string renamedFilePath = Path.ChangeExtension(filePath, ".acb");
+					File.Move(filePath, renamedFilePath);
+
+					// Step 7: Run the original ACB decompilation code
+					RunAcbEditor(renamedFilePath);
+					UpdateFileList(renamedFilePath);
+
+					MessageBox.Show("Processed .uasset file successfully.");
+				}
+				else
+				{
+					MessageBox.Show("The .uasset file does not contain the expected pattern.");
+				}
+			}
+			catch (Exception ex)
+			{
+				MessageBox.Show("Error handling .uasset file: " + ex.Message);
+			}
+		}
+
+
+
+
+
+
+
+
 
 
 		private void UpdateFileList(string acbFilePath)
