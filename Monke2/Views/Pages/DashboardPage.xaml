@@ -42,7 +42,7 @@
         VerticalAlignment="Top"
         Margin="10,10,0,0" />
 
-        <ProgressBar x:Name="conversionProgressBar" Grid.Row="1" Height="20" Margin="10,62,400,316" />
+        <ProgressBar x:Name="conversionProgressBar" Grid.Row="1" Height="20" Margin="10,62,400,316" Value="{Binding ConversionProgress}" />
 
 
         <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="10,10,10,0">
