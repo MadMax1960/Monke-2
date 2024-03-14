@@ -163,7 +163,7 @@ namespace Monke2.ViewModels.Pages
 			if (!string.IsNullOrEmpty(ACBNameInput))
 			{
 				string folderPath = SelectedFolderPath;
-				string configFileName = "config.yml";
+				string configFileName = "config.yaml";
 				string configFilePath = Path.Combine(folderPath, configFileName);
 
 				try

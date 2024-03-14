@@ -23,8 +23,8 @@ namespace Monke2.Views.Pages
 		{
 			OpenFileDialog openFileDialog = new OpenFileDialog
 			{
-				Filter = "ACB Files (*.acb)|*.acb|UASSET Files (*.uasset)|*.uasset",
-				Title = "Select ACB or UASSET File"
+				Filter = "UASSET Files (*.uasset)|*.uasset|ACB Files (*.acb)|*.acb",
+				Title = "Select UASSET or ACB File"
 			};
 
 			if (openFileDialog.ShowDialog() == true)
