@@ -205,8 +205,10 @@ namespace Monke2.ViewModels.Pages
 				// Check if both text boxes have numbers and append the loop parameters
 				if (int.TryParse(NumberInput1, out int loopStart) && int.TryParse(NumberInput2, out int loopEnd))
 				{
-					arguments += $" -l {loopStart}-{loopEnd} --keycode 11918920";
+					arguments += $" -l {loopStart}-{loopEnd}";
 				}
+				// Always append the keycode argument
+				arguments += " --keycode 11918920";
 
 				RunVGAudioCli(exePath, arguments);
 			}
