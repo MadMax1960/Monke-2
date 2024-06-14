@@ -23,7 +23,7 @@ namespace Monke2.ViewModels.Pages
 			set => SetProperty(ref _acbNameInput, value);
 		}
 
-		public ICommand HCAConversionCommand { get; }
+		public ICommand adxConversionCommand { get; }
 		public ICommand EnterACBNameCommand { get; }
 
 		public ICommand CreateConfigCommand { get; }
@@ -68,21 +68,21 @@ namespace Monke2.ViewModels.Pages
 			}
 		}
 
-		// ICommand for Batch HCA Conversion
-		public ICommand BatchHCAConversionCommand { get; }
+		// ICommand for Batch adx Conversion
+		public ICommand BatchadxConversionCommand { get; }
 
 		public DashboardViewModel()
 		{
-			// Initialize BatchHCAConversionCommand to a RelayCommand or DelegateCommand
-			BatchHCAConversionCommand = new RelayCommand(BatchHCAConversion);
-			// Initialize HCAConversionCommand
-			HCAConversionCommand = new RelayCommand(HCAConversion);
+			// Initialize BatchadxConversionCommand to a RelayCommand or DelegateCommand
+			BatchadxConversionCommand = new RelayCommand(BatchadxConversion);
+			// Initialize adxConversionCommand
+			adxConversionCommand = new RelayCommand(adxConversion);
 			// Initialize EnterACBNameCommand to a RelayCommand or DelegateCommand
 			EnterACBNameCommand = new RelayCommand(EnterACBName);
 			CreateConfigCommand = new RelayCommand(CreateConfig);
 		}
 
-		private async void BatchHCAConversion()
+		private async void BatchadxConversion()
 		{
 			await Task.Run(() =>
 			{
@@ -94,8 +94,8 @@ namespace Monke2.ViewModels.Pages
 				for (int i = 0; i < totalFiles; i++)
 				{
 					string wavFile = wavFiles[i];
-					string hcaFileName = Path.ChangeExtension(wavFile, ".hca");
-					string arguments = $"\"{wavFile}\" \"{hcaFileName}\" --keycode 11918920";
+					string adxFileName = Path.ChangeExtension(wavFile, ".adx");
+					string arguments = $"\"{wavFile}\" \"{adxFileName}\"";
 
 					ProcessStartInfo startInfo = new ProcessStartInfo
 					{
@@ -131,7 +131,7 @@ namespace Monke2.ViewModels.Pages
 				});
 			});
 
-			MessageBox.Show("Monke has made your HCAs.");
+			MessageBox.Show("Monke has made your adxs.");
 		}
 
 		private void EnterACBName()
@@ -192,12 +192,12 @@ namespace Monke2.ViewModels.Pages
 
 
 
-		private void HCAConversion()
+		private void adxConversion()
 		{
 			if (!string.IsNullOrEmpty(SelectedFilePath))
 			{
 				string exePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "VGAudioCli.exe");
-				string outputFileName = Path.ChangeExtension(SelectedFilePath, ".hca");
+				string outputFileName = Path.ChangeExtension(SelectedFilePath, ".adx");
 
 				// Build the command arguments
 				string arguments = $"\"{SelectedFilePath}\" \"{outputFileName}\"";
@@ -208,7 +208,7 @@ namespace Monke2.ViewModels.Pages
 					arguments += $" -l {loopStart}-{loopEnd}";
 				}
 				// Always append the keycode argument
-				arguments += " --keycode 11918920";
+				arguments += "";
 
 				RunVGAudioCli(exePath, arguments);
 			}

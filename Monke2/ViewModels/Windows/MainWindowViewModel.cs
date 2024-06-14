@@ -19,7 +19,7 @@ namespace Monke2.ViewModels.Windows
 		{
 			new NavigationViewItem()
 			{
-				Content = "HCA",
+				Content = "adx",
 				Icon = new SymbolIcon { Symbol = SymbolRegular.MusicNote120 },
 				TargetPageType = typeof(Views.Pages.DashboardPage)
 			},

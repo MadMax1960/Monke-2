@@ -36,9 +36,9 @@
            VerticalAlignment="Top"
            Margin="190,17,0,0"/>
 
-        <!-- Button for Batch HCA conversion -->
-        <Button Grid.Row="1" Content="Batch HCA conversion"
-        Command="{Binding BatchHCAConversionCommand}"
+        <!-- Button for Batch adx conversion -->
+        <Button Grid.Row="1" Content="Batch adx conversion"
+        Command="{Binding BatchadxConversionCommand}"
         VerticalAlignment="Top"
         Margin="10,10,0,0" />
 
@@ -53,7 +53,7 @@
                        VerticalAlignment="Center" />
         </StackPanel>
 
-        <!-- New Section for HCA Conversion Options -->
+        <!-- New Section for adx Conversion Options -->
         <StackPanel Grid.Row="1" Orientation="Vertical" Margin="10,260,10,10">
             <Grid Margin="0,0,0,10">
                 <TextBox x:Name="numberInput1" Text="{Binding NumberInput1}" Background="Transparent"/>
@@ -68,9 +68,9 @@
             </Grid>
 
 
-            <!-- Button for HCA Conversion -->
-            <Button Content="HCA Conversion"
-                    Command="{Binding HCAConversionCommand}" />
+            <!-- Button for adx Conversion -->
+            <Button Content="adx Conversion"
+                    Command="{Binding adxConversionCommand}" />
 
             <!-- TextBlock for Instruction Message -->
             <TextBlock Text="Leave box empty if no loops!"

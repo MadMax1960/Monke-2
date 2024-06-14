@@ -23,8 +23,8 @@ namespace Monke2.Views.Pages
 		{
 			OpenFileDialog openFileDialog = new OpenFileDialog
 			{
-				Filter = "UASSET Files (*.uexp)|*.uexp|ACB Files (*.acb)|*.acb",
-				Title = "Select UASSET or ACB File"
+				Filter = "uexp Files (*.uexp)|*.uexp|ACB Files (*.acb)|*.acb",
+				Title = "Select uexp or ACB File"
 			};
 
 			if (openFileDialog.ShowDialog() == true)
@@ -33,8 +33,8 @@ namespace Monke2.Views.Pages
 
 				if (filePath.EndsWith(".uexp", StringComparison.OrdinalIgnoreCase))
 				{
-					// Handle UASSET file
-					HandleUASSETFile(filePath);
+					// Handle uexp file
+					HandleuexpFile(filePath);
 				}
 				else if (filePath.EndsWith(".acb", StringComparison.OrdinalIgnoreCase))
 				{
@@ -49,7 +49,7 @@ namespace Monke2.Views.Pages
 			}
 		}
 
-		private void HandleUASSETFile(string filePath)
+		private void HandleuexpFile(string filePath)
 		{
 			try
 			{
@@ -159,8 +159,8 @@ namespace Monke2.Views.Pages
 		{
 			OpenFileDialog openFileDialog = new OpenFileDialog
 			{
-				Filter = "UASSET Files (*.uexp)|*.uexp",
-				Title = "Select UASSET File"
+				Filter = "uexp Files (*.uexp)|*.uexp",
+				Title = "Select uexp File"
 			};
 
 			if (openFileDialog.ShowDialog() == true)
@@ -174,14 +174,14 @@ namespace Monke2.Views.Pages
 					// Run AcbEditor.exe with the folder path
 					RunAcbEditor(Path.Combine(folderPath, folderName));
 
-					// Find the ACB file with the same name as the UASSET file
+					// Find the ACB file with the same name as the uexp file
 					string acbFileName = folderName + ".acb";
 					string acbFilePath = Path.Combine(folderPath, acbFileName);
 
 					if (File.Exists(acbFilePath))
 					{
-						// Insert ACB into UASSET file
-						InsertAcbIntoUasset(uexpFilePath, acbFilePath);
+						// Insert ACB into uexp file
+						InsertAcbIntouexp(uexpFilePath, acbFilePath);
 					}
 					else
 					{
@@ -200,34 +200,34 @@ namespace Monke2.Views.Pages
 
 
 
-		private void InsertAcbIntoUasset(string uexpFilePath, string acbFilePath)
+		private void InsertAcbIntouexp(string uexpFilePath, string acbFilePath)
 		{
 			try
 			{
 				byte[] uexpBytes = File.ReadAllBytes(uexpFilePath);
 				byte[] acbBytes = File.ReadAllBytes(acbFilePath);
 
-				// Find the index of "@UTF" in the UASSET file
+				// Find the index of "@UTF" in the uexp file
 				int utfIndex = FindSequence(uexpBytes, new byte[] { 0x40, 0x55, 0x54, 0x46 });
 
 				if (utfIndex != -1)
 				{
-					// Overwrite bytes in the UASSET file with ACB bytes
+					// Overwrite bytes in the uexp file with ACB bytes
 					Array.Copy(acbBytes, 0, uexpBytes, utfIndex, acbBytes.Length);
 
-					// Write the modified UASSET file
+					// Write the modified uexp file
 					File.WriteAllBytes(uexpFilePath, uexpBytes);
 
-					MessageBox.Show($"ACB file '{Path.GetFileName(acbFilePath)}' inserted into UASSET file '{Path.GetFileName(uexpFilePath)}' successfully.");
+					MessageBox.Show($"ACB file '{Path.GetFileName(acbFilePath)}' inserted into uexp file '{Path.GetFileName(uexpFilePath)}' successfully.");
 				}
 				else
 				{
-					MessageBox.Show("Could not find '@UTF' in the UASSET file.");
+					MessageBox.Show("Could not find '@UTF' in the uexp file.");
 				}
 			}
 			catch (Exception ex)
 			{
-				MessageBox.Show("Error inserting ACB into UASSET file: " + ex.Message);
+				MessageBox.Show("Error inserting ACB into uexp file: " + ex.Message);
 			}
 		}
 
