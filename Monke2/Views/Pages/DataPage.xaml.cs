@@ -23,7 +23,7 @@ namespace Monke2.Views.Pages
 		{
 			OpenFileDialog openFileDialog = new OpenFileDialog
 			{
-				Filter = "UASSET Files (*.uasset)|*.uasset|ACB Files (*.acb)|*.acb",
+				Filter = "UASSET Files (*.uexp)|*.uexp|ACB Files (*.acb)|*.acb",
 				Title = "Select UASSET or ACB File"
 			};
 
@@ -31,7 +31,7 @@ namespace Monke2.Views.Pages
 			{
 				string filePath = openFileDialog.FileName;
 
-				if (filePath.EndsWith(".uasset", StringComparison.OrdinalIgnoreCase))
+				if (filePath.EndsWith(".uexp", StringComparison.OrdinalIgnoreCase))
 				{
 					// Handle UASSET file
 					HandleUASSETFile(filePath);
@@ -53,7 +53,7 @@ namespace Monke2.Views.Pages
 		{
 			try
 			{
-				// Read the .uasset file as bytes
+				// Read the .uexp file as bytes
 				byte[] fileBytes = File.ReadAllBytes(filePath);
 
 				// Search for the first occurrence of "@UTF" in the byte array
@@ -73,16 +73,16 @@ namespace Monke2.Views.Pages
 					RunAcbEditor(newFilePath);
 					UpdateFileList(newFilePath);
 
-					MessageBox.Show("Processed .uasset file successfully.");
+					MessageBox.Show("Processed .uexp file successfully.");
 				}
 				else
 				{
-					MessageBox.Show("The .uasset file does not contain the expected pattern.");
+					MessageBox.Show("The .uexp file does not contain the expected pattern.");
 				}
 			}
 			catch (Exception ex)
 			{
-				MessageBox.Show("Error handling .uasset file: " + ex.Message);
+				MessageBox.Show("Error handling .uexp file: " + ex.Message);
 			}
 		}
 
@@ -159,15 +159,15 @@ namespace Monke2.Views.Pages
 		{
 			OpenFileDialog openFileDialog = new OpenFileDialog
 			{
-				Filter = "UASSET Files (*.uasset)|*.uasset",
+				Filter = "UASSET Files (*.uexp)|*.uexp",
 				Title = "Select UASSET File"
 			};
 
 			if (openFileDialog.ShowDialog() == true)
 			{
-				string uassetFilePath = openFileDialog.FileName;
-				string folderPath = Path.GetDirectoryName(uassetFilePath);
-				string folderName = Path.GetFileNameWithoutExtension(uassetFilePath);
+				string uexpFilePath = openFileDialog.FileName;
+				string folderPath = Path.GetDirectoryName(uexpFilePath);
+				string folderName = Path.GetFileNameWithoutExtension(uexpFilePath);
 
 				if (Directory.Exists(folderPath))
 				{
@@ -181,7 +181,7 @@ namespace Monke2.Views.Pages
 					if (File.Exists(acbFilePath))
 					{
 						// Insert ACB into UASSET file
-						InsertAcbIntoUasset(uassetFilePath, acbFilePath);
+						InsertAcbIntoUasset(uexpFilePath, acbFilePath);
 					}
 					else
 					{
@@ -200,25 +200,25 @@ namespace Monke2.Views.Pages
 
 
 
-		private void InsertAcbIntoUasset(string uassetFilePath, string acbFilePath)
+		private void InsertAcbIntoUasset(string uexpFilePath, string acbFilePath)
 		{
 			try
 			{
-				byte[] uassetBytes = File.ReadAllBytes(uassetFilePath);
+				byte[] uexpBytes = File.ReadAllBytes(uexpFilePath);
 				byte[] acbBytes = File.ReadAllBytes(acbFilePath);
 
 				// Find the index of "@UTF" in the UASSET file
-				int utfIndex = FindSequence(uassetBytes, new byte[] { 0x40, 0x55, 0x54, 0x46 });
+				int utfIndex = FindSequence(uexpBytes, new byte[] { 0x40, 0x55, 0x54, 0x46 });
 
 				if (utfIndex != -1)
 				{
 					// Overwrite bytes in the UASSET file with ACB bytes
-					Array.Copy(acbBytes, 0, uassetBytes, utfIndex, acbBytes.Length);
+					Array.Copy(acbBytes, 0, uexpBytes, utfIndex, acbBytes.Length);
 
 					// Write the modified UASSET file
-					File.WriteAllBytes(uassetFilePath, uassetBytes);
+					File.WriteAllBytes(uexpFilePath, uexpBytes);
 
-					MessageBox.Show($"ACB file '{Path.GetFileName(acbFilePath)}' inserted into UASSET file '{Path.GetFileName(uassetFilePath)}' successfully.");
+					MessageBox.Show($"ACB file '{Path.GetFileName(acbFilePath)}' inserted into UASSET file '{Path.GetFileName(uexpFilePath)}' successfully.");
 				}
 				else
 				{
