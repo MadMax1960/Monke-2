@@ -31,7 +31,7 @@ namespace Monke2.Views.Pages
 		{
 			if (sender is System.Windows.Controls.TextBox textBox && string.IsNullOrWhiteSpace(textBox.Text))
 			{
-				textBox.Text = "Enter your input here..."; // Set placeholder text when the text box is empty
+				textBox.Text = "Enter your encryption key here..."; // Set placeholder text when the text box is empty
 				textBox.Foreground = System.Windows.Media.Brushes.Gray; // Optional: Set the color to gray to mimic placeholder text
 			}
 		}
