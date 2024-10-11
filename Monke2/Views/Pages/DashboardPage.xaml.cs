@@ -7,12 +7,11 @@ namespace Monke2.Views.Pages
 	{
 		public DashboardViewModel ViewModel { get; }
 
-		public DashboardPage(DashboardViewModel viewModel)
+		public DashboardPage(DashboardViewModel viewModel, SettingsViewModel settingsViewModel)
 		{
-			InitializeComponent();  // This line is crucial
-
-			ViewModel = viewModel;
-			DataContext = ViewModel; // Assign ViewModel to DataContext
+			InitializeComponent();
+			ViewModel = new DashboardViewModel(settingsViewModel); // Pass the shared SettingsViewModel instance
+			DataContext = ViewModel;
 		}
 	}
 }

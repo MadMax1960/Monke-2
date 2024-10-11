@@ -17,7 +17,10 @@ namespace Monke2.ViewModels.Pages
 		[ObservableProperty]
 		private Wpf.Ui.Appearance.ThemeType _currentTheme = Wpf.Ui.Appearance.ThemeType.Unknown;
 
-		public void OnNavigatedTo()
+		[ObservableProperty]
+		private string _userInput = string.Empty;
+
+	public void OnNavigatedTo()
 		{
 			if (!_isInitialized)
 				InitializeViewModel();

@@ -2,6 +2,7 @@
 using System.IO;
 using System.Windows.Input;
 using Microsoft.Win32;
+using static System.Runtime.CompilerServices.RuntimeHelpers;
 
 namespace Monke2.ViewModels.Pages
 {
@@ -71,17 +72,18 @@ namespace Monke2.ViewModels.Pages
 		// ICommand for Batch HCA Conversion
 		public ICommand BatchHCAConversionCommand { get; }
 
-		public DashboardViewModel()
+		private readonly SettingsViewModel _settingsViewModel;
+
+		public DashboardViewModel(SettingsViewModel settingsViewModel)
 		{
-			// Initialize BatchHCAConversionCommand to a RelayCommand or DelegateCommand
+			_settingsViewModel = settingsViewModel;
+
+			// Initialize commands
 			BatchHCAConversionCommand = new RelayCommand(BatchHCAConversion);
-			// Initialize HCAConversionCommand
 			HCAConversionCommand = new RelayCommand(HCAConversion);
-			// Initialize EnterACBNameCommand to a RelayCommand or DelegateCommand
 			EnterACBNameCommand = new RelayCommand(EnterACBName);
 			CreateConfigCommand = new RelayCommand(CreateConfig);
 		}
-
 		private async void BatchHCAConversion()
 		{
 			await Task.Run(() =>
@@ -91,11 +93,22 @@ namespace Monke2.ViewModels.Pages
 				int totalFiles = wavFiles.Length;
 				string vgaudiocliPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "vgaudiocli.exe");
 
+				// Retrieve the keycode from SettingsViewModel
+				string keycode = _settingsViewModel.UserInput;
+
 				for (int i = 0; i < totalFiles; i++)
 				{
 					string wavFile = wavFiles[i];
 					string hcaFileName = Path.ChangeExtension(wavFile, ".hca");
-					string arguments = $"\"{wavFile}\" \"{hcaFileName}\" --keycode 11918920";
+
+					// Build the command arguments
+					string arguments = $"\"{wavFile}\" \"{hcaFileName}\"";
+
+					// If the keycode is not the default placeholder, append it to the command
+					if (!string.IsNullOrEmpty(keycode) && keycode != "Enter your encryption key here...")
+					{
+						arguments += $" --keycode {keycode}";
+					}
 
 					ProcessStartInfo startInfo = new ProcessStartInfo
 					{
@@ -115,6 +128,7 @@ namespace Monke2.ViewModels.Pages
 					}
 					catch (Exception ex)
 					{
+						// Handle the error here
 					}
 
 					// Update UI thread with the progress
@@ -137,7 +151,7 @@ namespace Monke2.ViewModels.Pages
 		private void EnterACBName()
 		{
 			// Prompt user for ACB name
-			string acbName = Microsoft.VisualBasic.Interaction.InputBox("Enter ACB Name:", "ACB Name", "");
+			string acbName = Microsoft.VisualBasic.Interaction.InputBox("Are you using Ryo? Then enter ACB Name:", "ACB Name", "");
 
 			// Use the entered ACB name as needed
 			if (!string.IsNullOrEmpty(acbName))
@@ -151,7 +165,7 @@ namespace Monke2.ViewModels.Pages
 			}
 			else
 			{
-				MessageBox.Show("ACB Name not entered.");
+				MessageBox.Show("ACB Name not entered, no config will be made.");
 			}
 		}
 
@@ -207,9 +221,20 @@ namespace Monke2.ViewModels.Pages
 				{
 					arguments += $" -l {loopStart}-{loopEnd}";
 				}
-				// Always append the keycode argument
-				arguments += " --keycode 11918920";
 
+				// Retrieve the keycode from SettingsViewModel
+				string keycode = _settingsViewModel.UserInput;
+
+				// Append the keycode argument only if it's not the default placeholder
+				if (!string.IsNullOrEmpty(keycode) && keycode != "Enter your encryption key here...")
+				{
+					arguments += $" --keycode {keycode}";
+				}
+
+				// Show the command in a popup box for debugging
+				//MessageBox.Show($"Running command: {exePath} {arguments}");
+
+				// Run the command
 				RunVGAudioCli(exePath, arguments);
 			}
 			else
@@ -218,6 +243,8 @@ namespace Monke2.ViewModels.Pages
 				MessageBox.Show("Please select a file first.");
 			}
 		}
+
+
 
 		private void RunVGAudioCli(string exePath, string arguments)
 		{
