@@ -51,7 +51,7 @@
                  GotFocus="UserInputTextBox_GotFocus"
                  LostFocus="UserInputTextBox_LostFocus"/>
 
-        <TextBlock Text="Enter your input here..."
+        <TextBlock Text="Enter your encryption key here..."
                    Foreground="Gray"
                    VerticalAlignment="Center"
                    HorizontalAlignment="Left"
